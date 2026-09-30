@@ -10,13 +10,14 @@ export function iconSvg({ bg = true, scale = 1, radius = 112 } = {}) {
         const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a);
         beads.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="13.5" fill="url(#bead)"/>`);
     }
-    const star = (size) => {
-        const s = size;
-        return `<g transform="translate(${cx} ${cy})" fill="none" stroke="url(#gold)" stroke-width="9" stroke-linejoin="round">
-            <rect x="${-s}" y="${-s}" width="${2 * s}" height="${2 * s}" rx="6"/>
-            <rect x="${-s}" y="${-s}" width="${2 * s}" height="${2 * s}" rx="6" transform="rotate(45)"/>
-            <circle r="${s * 0.38}" fill="url(#gold)" stroke="none"/>
-        </g>`;
+    // Crescent: a gold disc with an offset disc cut out of it, opening to the upper-left.
+    const crescent = (R, shift = 0) => {
+        const r = R * 0.82, dx = -R * 0.42, dy = -R * 0.26;
+        const x = cx + shift;
+        return `<mask id="moon"><rect width="512" height="512" fill="#000"/>
+            <circle cx="${x}" cy="${cy}" r="${R}" fill="#fff"/>
+            <circle cx="${x + dx}" cy="${cy + dy}" r="${r}" fill="#000"/></mask>
+            <circle cx="${x}" cy="${cy}" r="${R}" fill="url(#gold)" mask="url(#moon)"/>`;
     };
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
@@ -36,7 +37,7 @@ export function iconSvg({ bg = true, scale = 1, radius = 112 } = {}) {
     <path d="M256 ${cy + r - 6} v36" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>
     <ellipse cx="256" cy="${cy + r + 44}" rx="17" ry="22" fill="url(#bead)"/>
     <path d="M246 ${cy + r + 62} l-12 44 M256 ${cy + r + 64} v46 M266 ${cy + r + 62} l12 44" stroke="url(#gold)" stroke-width="6" stroke-linecap="round"/>
-    ${star(52)}
+    ${crescent(70, -10)}
   </g>
 </svg>`;
 }

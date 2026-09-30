@@ -17,6 +17,8 @@ const LocalNotifications = plugin('LocalNotifications');
 const App = plugin('App');
 const KeepAwake = plugin('KeepAwake');
 const StatusBar = plugin('StatusBar');
+const Share = plugin('Share');
+const VolumeKeys = plugin('VolumeKeys');
 
 /* ---------- Vibration ---------- */
 const TAP_MS = { light: 12, medium: 25, heavy: 45 };
@@ -41,6 +43,16 @@ export function vibrateGoal() {
         });
     } else if (navigator.vibrate) {
         navigator.vibrate(pattern);
+    }
+}
+
+// A soft double pulse (used every 10 counts).
+export function vibratePulse() {
+    if (Haptics) {
+        fire(() => Haptics.impact({ style: 'HEAVY' }));
+        setTimeout(() => fire(() => Haptics.impact({ style: 'HEAVY' })), 120);
+    } else if (navigator.vibrate) {
+        navigator.vibrate([35, 70, 35]);
     }
 }
 
@@ -126,12 +138,14 @@ export async function notifyNow(title, body) {
     } catch { return false; }
 }
 
-// Reminder ids 1..99 belong to scheduled reminders; they are rebuilt on every change.
-export async function scheduleReminders(list) {
+// Notifications are grouped by id range; a group is fully replaced on every change.
+//   1..99    daily reminders (morning/evening/friday/periodic)
+//   200..299 prayer-time alerts, 300..399 after-prayer adhkar reminders
+export async function scheduleGroup(minId, maxId, list) {
     if (!LocalNotifications) return false;
     try {
         const pending = await LocalNotifications.getPending();
-        const old = pending.notifications.filter((n) => n.id < 100).map((n) => ({ id: n.id }));
+        const old = pending.notifications.filter((n) => n.id >= minId && n.id < maxId).map((n) => ({ id: n.id }));
         if (old.length) await LocalNotifications.cancel({ notifications: old });
         if (!list.length) return true;
         await LocalNotifications.schedule({
@@ -141,13 +155,56 @@ export async function scheduleReminders(list) {
                 body: r.body,
                 smallIcon: 'ic_stat_notify',
                 iconColor: '#D8B46A',
-                schedule: { on: r.on, allowWhileIdle: true },
+                schedule: r.at ? { at: r.at, allowWhileIdle: true } : { on: r.on, allowWhileIdle: true },
             })),
         });
         return true;
     } catch (e) {
-        console.warn('scheduleReminders failed', e);
+        console.warn('scheduleGroup failed', e);
         return false;
+    }
+}
+export const scheduleReminders = (list) => scheduleGroup(1, 100, list);
+
+/* ---------- Share ---------- */
+export async function shareText(title, text) {
+    try {
+        if (Share) { await Share.share({ title, text, dialogTitle: title }); return 'shared'; }
+        if (navigator.share) { await navigator.share({ title, text }); return 'shared'; }
+        await navigator.clipboard.writeText(text);
+        return 'copied';
+    } catch {
+        return 'failed';
+    }
+}
+
+/* ---------- Location ---------- */
+export function getPosition() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) { reject(new Error('unsupported')); return; }
+        navigator.geolocation.getCurrentPosition(
+            (p) => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
+            (e) => reject(e),
+            { enableHighAccuracy: false, timeout: 20000, maximumAge: 10 * 60 * 1000 },
+        );
+    });
+}
+
+/* ---------- Volume keys (Android only) ---------- */
+export const hasVolumeKeys = !!VolumeKeys;
+export function setVolumeKeys(on) {
+    if (VolumeKeys) fire(() => VolumeKeys.setEnabled({ enabled: !!on }));
+}
+export function onVolumeKey(handler) {
+    if (VolumeKeys) VolumeKeys.addListener('press', (e) => handler(e && e.direction));
+}
+
+// Called with the notification id when the user taps one of our notifications.
+export function onNotificationTap(handler) {
+    if (LocalNotifications) {
+        LocalNotifications.addListener('localNotificationActionPerformed', (e) => {
+            handler(e && e.notification ? e.notification.id : null);
+        });
     }
 }
 

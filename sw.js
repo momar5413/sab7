@@ -1,8 +1,9 @@
 // Offline support for the web version (not used inside the Android app).
-const CACHE = 'sab7-v2';
+const CACHE = 'sab7-v3';
 const SHELL = [
-    './', './index.html', './css/style.css', './js/app.js', './js/platform.js',
-    './manifest.webmanifest', './img/img1.jpg', './icons/icon-192.png',
+    './', './index.html', './css/style.css', './manifest.webmanifest', './img/img1.jpg', './icons/icon-192.png',
+    './js/app.js', './js/platform.js', './js/store.js', './js/ui.js', './js/data.js', './js/counter.js',
+    './js/adhkar.js', './js/prayer.js', './js/me.js', './js/settings.js', './js/vendor/adhan.js',
 ];
 
 self.addEventListener('install', (e) => {
