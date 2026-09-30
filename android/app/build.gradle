@@ -16,6 +16,14 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        debug {
+            // Sign with every scheme so the APK installs from any file manager / older installer.
+            enableV1Signing true
+            enableV2Signing true
+            enableV3Signing true
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
