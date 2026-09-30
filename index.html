@@ -1,18 +1,238 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./style.css/sb.css">
-    <title>tasbe7</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="theme-color" content="#0b1411">
+    <meta name="description" content="سبحة إلكترونية: عدّاد تسبيح مع أهداف، اهتزاز، تذكيرات وإحصائيات">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icons/icon-192.png">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>سبحة</title>
 </head>
 
-<body>
-    <div class="counter">0</div>
-    <h1>سبحان الله</h1>
-    <button class="btn">+</button>
-    <script src="./main.js/main.js"></script>
+<body data-theme="image">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+            <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+            <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+            <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+            <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></symbol>
+            <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></symbol>
+            <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+            <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+            <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+            <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></symbol>
+            <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+            <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+        </defs>
+    </svg>
+
+    <div class="app">
+        <header class="topbar">
+            <button class="icon-btn" id="btnStats" aria-label="الإحصائيات"><svg><use href="#i-chart"/></svg></button>
+            <div class="brand">
+                <span class="brand-name">سُبحة</span>
+                <span class="today-pill" id="todayPill">اليوم 0</span>
+            </div>
+            <button class="icon-btn" id="btnSettings" aria-label="الإعدادات"><svg><use href="#i-gear"/></svg></button>
+        </header>
+
+        <div class="segmented" role="tablist" aria-label="نوع التسبيح">
+            <button role="tab" data-mode="free" class="seg active">ذكر حر</button>
+            <button role="tab" data-mode="prayer" class="seg">أذكار بعد الصلاة</button>
+        </div>
+
+        <button class="dhikr-card" id="dhikrCard" aria-label="اختيار الذكر">
+            <span class="dhikr-text" id="dhikrText">سبحان الله</span>
+            <span class="dhikr-virtue" id="dhikrVirtue"></span>
+            <span class="dhikr-change" id="dhikrChange"><svg><use href="#i-chev"/></svg> تغيير الذكر</span>
+        </button>
+
+        <div class="seq-steps" id="seqSteps" hidden></div>
+
+        <main class="counter-zone" id="counterZone">
+            <button class="counter" id="counterBtn" aria-label="سبّح">
+                <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
+                    <circle class="ring-track" cx="100" cy="100" r="90"/>
+                    <circle class="ring-bar" id="ringBar" cx="100" cy="100" r="90"/>
+                </svg>
+                <span class="counter-inner">
+                    <span class="count" id="count">0</span>
+                    <span class="target" id="targetLabel">من 33</span>
+                    <span class="rounds" id="roundsLabel"></span>
+                </span>
+                <span class="ripple-layer" id="rippleLayer"></span>
+            </button>
+            <p class="hint" id="hint">اضغط على الدائرة للتسبيح</p>
+        </main>
+
+        <nav class="actions">
+            <button class="action" id="btnUndo"><svg><use href="#i-undo"/></svg><span>تراجع</span></button>
+            <button class="action" id="btnTarget"><svg><use href="#i-target"/></svg><span id="btnTargetLabel">الهدف 33</span></button>
+            <button class="action" id="btnList"><svg><use href="#i-list"/></svg><span>الأذكار</span></button>
+            <button class="action" id="btnReset"><svg><use href="#i-reset"/></svg><span>تصفير</span></button>
+        </nav>
+    </div>
+
+    <!-- Sheets -->
+    <div class="backdrop" id="backdrop" hidden></div>
+
+    <section class="sheet" id="sheetList" role="dialog" aria-label="الأذكار" hidden>
+        <div class="sheet-handle"></div>
+        <header class="sheet-head">
+            <h2>اختر الذكر</h2>
+            <button class="icon-btn small" data-close aria-label="إغلاق"><svg><use href="#i-close"/></svg></button>
+        </header>
+        <ul class="dhikr-list" id="dhikrList"></ul>
+        <form class="add-form" id="addForm" autocomplete="off">
+            <h3>إضافة ذكر خاص</h3>
+            <textarea id="addText" rows="2" maxlength="200" placeholder="اكتب الذكر هنا..." required></textarea>
+            <div class="row">
+                <label class="field">
+                    <span>الهدف</span>
+                    <input id="addTarget" type="number" inputmode="numeric" min="0" max="100000" value="33">
+                </label>
+                <button class="primary" type="submit"><svg><use href="#i-plus"/></svg> إضافة</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="sheet" id="sheetTarget" role="dialog" aria-label="الهدف" hidden>
+        <div class="sheet-handle"></div>
+        <header class="sheet-head">
+            <h2>عدد التسبيح (الهدف)</h2>
+            <button class="icon-btn small" data-close aria-label="إغلاق"><svg><use href="#i-close"/></svg></button>
+        </header>
+        <div class="chips" id="targetChips">
+            <button data-target="33">33</button>
+            <button data-target="99">99</button>
+            <button data-target="100">100</button>
+            <button data-target="500">500</button>
+            <button data-target="1000">1000</button>
+            <button data-target="0">بلا حد</button>
+        </div>
+        <form class="row custom-target" id="customTargetForm">
+            <label class="field grow">
+                <span>عدد مخصص</span>
+                <input id="customTarget" type="number" inputmode="numeric" min="1" max="100000" placeholder="مثال: 70">
+            </label>
+            <button class="primary" type="submit">تعيين</button>
+        </form>
+    </section>
+
+    <section class="sheet" id="sheetStats" role="dialog" aria-label="الإحصائيات" hidden>
+        <div class="sheet-handle"></div>
+        <header class="sheet-head">
+            <h2>الإحصائيات</h2>
+            <button class="icon-btn small" data-close aria-label="إغلاق"><svg><use href="#i-close"/></svg></button>
+        </header>
+        <div class="stat-grid">
+            <div class="stat"><b id="stToday">0</b><span>اليوم</span></div>
+            <div class="stat"><b id="stWeek">0</b><span>آخر 7 أيام</span></div>
+            <div class="stat"><b id="stTotal">0</b><span>المجموع الكلي</span></div>
+            <div class="stat"><b id="stStreak">0</b><span>أيام متتالية</span></div>
+        </div>
+        <h3 class="sub">آخر 7 أيام</h3>
+        <div class="bars" id="stBars"></div>
+        <h3 class="sub">أكثر الأذكار</h3>
+        <ul class="top-list" id="stTop"></ul>
+        <p class="muted center" id="stBest"></p>
+    </section>
+
+    <section class="sheet" id="sheetSettings" role="dialog" aria-label="الإعدادات" hidden>
+        <div class="sheet-handle"></div>
+        <header class="sheet-head">
+            <h2>الإعدادات</h2>
+            <button class="icon-btn small" data-close aria-label="إغلاق"><svg><use href="#i-close"/></svg></button>
+        </header>
+
+        <div class="group">
+            <h3>الاهتزاز والصوت</h3>
+            <label class="switch-row"><span>اهتزاز مع كل تسبيحة</span><input type="checkbox" data-setting="vibrateTap"><i></i></label>
+            <label class="switch-row"><span>اهتزاز قوي عند إكمال الهدف</span><input type="checkbox" data-setting="vibrateGoal"><i></i></label>
+            <div class="select-row">
+                <span>قوة الاهتزاز</span>
+                <div class="mini-seg" data-setting-seg="vibrateStrength">
+                    <button data-value="light">خفيف</button>
+                    <button data-value="medium">متوسط</button>
+                    <button data-value="heavy">قوي</button>
+                </div>
+            </div>
+            <label class="switch-row"><span>صوت النقر</span><input type="checkbox" data-setting="sound"><i></i></label>
+        </div>
+
+        <div class="group">
+            <h3>الإشعارات والتذكيرات</h3>
+            <label class="switch-row"><span>إشعار عند إكمال الهدف</span><input type="checkbox" data-setting="notifyGoal"><i></i></label>
+            <div class="switch-row with-time">
+                <label><span>تذكير أذكار الصباح</span><input type="checkbox" data-setting="remindMorning"><i></i></label>
+                <input type="time" data-setting-time="morningTime">
+            </div>
+            <div class="switch-row with-time">
+                <label><span>تذكير أذكار المساء</span><input type="checkbox" data-setting="remindEvening"><i></i></label>
+                <input type="time" data-setting-time="eveningTime">
+            </div>
+            <label class="switch-row"><span>تذكير الجمعة بالصلاة على النبي ﷺ</span><input type="checkbox" data-setting="remindFriday"><i></i></label>
+            <div class="select-row">
+                <span>تذكير دوري بالتسبيح</span>
+                <div class="mini-seg" data-setting-seg="remindEvery">
+                    <button data-value="0">إيقاف</button>
+                    <button data-value="1">كل ساعة</button>
+                    <button data-value="2">ساعتين</button>
+                    <button data-value="4">4 ساعات</button>
+                </div>
+            </div>
+            <p class="muted small" id="notifNote"></p>
+            <button class="ghost" id="btnTestNotif">تجربة إشعار</button>
+        </div>
+
+        <div class="group">
+            <h3>سهولة الاستخدام</h3>
+            <label class="switch-row"><span>التسبيح بالضغط في أي مكان من الشاشة</span><input type="checkbox" data-setting="tapAnywhere"><i></i></label>
+            <label class="switch-row"><span>إبقاء الشاشة مضاءة</span><input type="checkbox" data-setting="keepAwake"><i></i></label>
+            <div class="select-row">
+                <span>حجم خط الذكر</span>
+                <div class="mini-seg" data-setting-seg="fontSize">
+                    <button data-value="s">صغير</button>
+                    <button data-value="m">متوسط</button>
+                    <button data-value="l">كبير</button>
+                </div>
+            </div>
+            <div class="select-row">
+                <span>المظهر</span>
+                <div class="mini-seg" data-setting-seg="theme">
+                    <button data-value="image">الصورة</button>
+                    <button data-value="emerald">زمردي</button>
+                    <button data-value="night">ليلي</button>
+                    <button data-value="light">فاتح</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="group">
+            <h3>البيانات</h3>
+            <button class="danger" id="btnWipe"><svg><use href="#i-trash"/></svg> حذف كل الإحصائيات</button>
+        </div>
+        <p class="muted center small">سُبحة · الإصدار 2.0</p>
+    </section>
+
+    <div class="dialog" id="confirmDialog" role="alertdialog" hidden>
+        <div class="dialog-box">
+            <p id="confirmText"></p>
+            <div class="row">
+                <button class="ghost" id="confirmNo">إلغاء</button>
+                <button class="danger" id="confirmYes">تأكيد</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="celebrate" id="celebrate" aria-hidden="true"></div>
+
+    <script type="module" src="./js/app.js"></script>
 </body>
 
 </html>

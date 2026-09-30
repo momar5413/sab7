@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">سُبحة</string>
+    <string name="title_activity_main">سُبحة</string>
+    <string name="package_name">com.sab7.tasbeeh</string>
+    <string name="custom_url_scheme">com.sab7.tasbeeh</string>
+</resources>

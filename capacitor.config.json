@@ -1,0 +1,18 @@
+{
+  "appId": "com.sab7.tasbeeh",
+  "appName": "سُبحة",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#0b1411"
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "css",
+      "style": "DARK"
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_notify",
+      "iconColor": "#D8B46A"
+    }
+  }
+}
