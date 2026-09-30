@@ -89,6 +89,7 @@ input, textarea { font: inherit; color: var(--text); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .app {
+    height: 100vh;
     height: 100dvh;
     max-width: 520px;
     margin: 0 auto;
@@ -156,7 +157,7 @@ input, textarea { font: inherit; color: var(--text); }
 /* ---------- Counter ---------- */
 .counter-zone { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
 .counter {
-    position: relative; width: min(72vw, 42dvh, 300px); aspect-ratio: 1; border-radius: 50%;
+    position: relative; width: min(72vw, 42vh, 300px); width: min(72vw, 42dvh, 300px); aspect-ratio: 1; border-radius: 50%;
     display: grid; place-items: center;
     background: radial-gradient(circle at 50% 35%, var(--surface-2), var(--surface) 70%);
     border: 1px solid var(--border);
@@ -172,6 +173,7 @@ input, textarea { font: inherit; color: var(--text); }
     stroke: var(--accent); stroke-linecap: round;
     stroke-dasharray: 565.49; stroke-dashoffset: 565.49;
     transition: stroke-dashoffset .25s ease, stroke .3s;
+    filter: drop-shadow(0 0 6px rgba(216, 180, 106, .5));
     filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 55%, transparent));
 }
 .counter.done .ring-bar { stroke: var(--green); }
@@ -184,6 +186,7 @@ input, textarea { font: inherit; color: var(--text); }
 .ripple-layer { position: absolute; inset: 0; pointer-events: none; }
 .ripple {
     position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%;
+    background: rgba(216, 180, 106, .35);
     background: color-mix(in srgb, var(--accent) 40%, transparent);
     animation: ripple .55s ease-out forwards;
 }
@@ -208,7 +211,7 @@ input, textarea { font: inherit; color: var(--text); }
 .backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, .5); z-index: 20; animation: fade .2s; }
 .sheet {
     position: fixed; z-index: 30; inset: auto 0 0 0; margin: 0 auto; max-width: 560px;
-    max-height: 88dvh; overflow-y: auto; overscroll-behavior: contain;
+    max-height: 88vh; max-height: 88dvh; overflow-y: auto; overscroll-behavior: contain;
     background: var(--sheet); color: var(--text);
     border-radius: 26px 26px 0 0; border: 1px solid var(--border); border-bottom: 0;
     padding: 8px 18px calc(var(--safe-bottom) + 22px);
@@ -251,7 +254,7 @@ textarea:focus, input:focus { border-color: var(--accent); }
 }
 .primary { background: var(--accent); color: var(--accent-ink); }
 .ghost { background: var(--surface-2); }
-.danger { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); width: 100%; }
+.danger { background: rgba(224, 100, 92, .16); background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); width: 100%; }
 .primary:active, .ghost:active, .danger:active { transform: scale(.96); }
 .primary svg, .danger svg { width: 18px; height: 18px; }
 

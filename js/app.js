@@ -589,7 +589,7 @@ function applySettings() {
     document.body.dataset.font = set.fontSize;
     const themeColor = { image: '#0b1411', emerald: '#07241c', night: '#0c0f1a', light: '#f5f1e8' }[set.theme] || '#0b1411';
     document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColor);
-    setBarsDark(set.theme !== 'light');
+    setBarsDark(set.theme !== 'light', themeColor);
     setKeepAwake(set.keepAwake);
 }
 

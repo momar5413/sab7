@@ -3,12 +3,20 @@
 const Cap = window.Capacitor;
 export const isNative = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
 
-const plugin = (name) => (isNative && Cap.registerPlugin ? Cap.registerPlugin(name) : null);
+// Capacitor exposes native plugins on window.Capacitor.Plugins; newer versions also offer registerPlugin().
+const plugin = (name) => {
+    if (!isNative) return null;
+    if (Cap.Plugins && Cap.Plugins[name]) return Cap.Plugins[name];
+    return Cap.registerPlugin ? Cap.registerPlugin(name) : null;
+};
+// Fire-and-forget a native call, whether it returns a promise, a value, or throws.
+const fire = (fn) => { Promise.resolve().then(fn).catch(() => {}); };
+
 const Haptics = plugin('Haptics');
 const LocalNotifications = plugin('LocalNotifications');
 const App = plugin('App');
 const KeepAwake = plugin('KeepAwake');
-const SystemBars = plugin('SystemBars');
+const StatusBar = plugin('StatusBar');
 
 /* ---------- Vibration ---------- */
 const TAP_MS = { light: 12, medium: 25, heavy: 45 };
@@ -16,7 +24,7 @@ const TAP_STYLE = { light: 'LIGHT', medium: 'MEDIUM', heavy: 'HEAVY' };
 
 export function vibrateTap(strength = 'medium') {
     if (Haptics) {
-        Haptics.impact({ style: TAP_STYLE[strength] || 'MEDIUM' }).catch(() => {});
+        fire(() => Haptics.impact({ style: TAP_STYLE[strength] || 'MEDIUM' }));
     } else if (navigator.vibrate) {
         navigator.vibrate(TAP_MS[strength] || 25);
     }
@@ -28,7 +36,7 @@ export function vibrateGoal() {
         // Haptics.vibrate only takes a single duration, so play the pattern manually.
         let t = 0;
         pattern.forEach((ms, i) => {
-            if (i % 2 === 0) setTimeout(() => Haptics.vibrate({ duration: ms }).catch(() => {}), t);
+            if (i % 2 === 0) setTimeout(() => fire(() => Haptics.vibrate({ duration: ms })), t);
             t += ms;
         });
     } else if (navigator.vibrate) {
@@ -148,10 +156,12 @@ export function onBackButton(handler) {
     if (App) App.addListener('backButton', handler);
 }
 export function exitApp() {
-    if (App) App.exitApp();
+    if (App) fire(() => App.exitApp());
 }
 
 /* ---------- Status / navigation bar icons ---------- */
-export function setBarsDark(darkBackground) {
-    if (SystemBars) SystemBars.setStyle({ style: darkBackground ? 'DARK' : 'LIGHT' }).catch(() => {});
+export function setBarsDark(darkBackground, color) {
+    if (!StatusBar) return;
+    fire(() => StatusBar.setStyle({ style: darkBackground ? 'DARK' : 'LIGHT' }));
+    if (color) fire(() => StatusBar.setBackgroundColor({ color }));
 }

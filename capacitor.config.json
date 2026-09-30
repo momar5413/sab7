@@ -6,13 +6,14 @@
     "backgroundColor": "#0b1411"
   },
   "plugins": {
-    "SystemBars": {
-      "insetsHandling": "css",
-      "style": "DARK"
-    },
     "LocalNotifications": {
       "smallIcon": "ic_stat_notify",
       "iconColor": "#D8B46A"
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0b1411",
+      "overlaysWebView": false
     }
   }
 }
